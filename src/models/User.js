@@ -1,18 +1,66 @@
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
-const userSchema = new mongoose.Schema(
+const UserSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    nama: {
+      type: String,
+      required: [true, "Nama wajib diisi"],
+      trim: true,
+    },
+    username: {
+      type: String,
+      required: [true, "Username wajib diisi"],
+      unique: true,
+      trim: true,
+      lowercase: true,
+    },
+    password: {
+      type: String,
+      required: [true, "Password wajib diisi"],
+      minlength: 6,
+    },
     role: {
       type: String,
       enum: ["siswa", "guru", "admin"],
-      default: "siswa",
+      required: true,
     },
-    kelas: String,
+
+    // ── Data Siswa ──
+    nisn: {
+      type: String,
+      default: null,
+    },
+    kelas: {
+      type: String, // misal "10 B"
+      default: null,
+    },
+
+    // ── Data Guru ──
+    nip: {
+      type: String,
+      default: null,
+    },
+    mapel: {
+      type: String, // misal "Matematika"
+      default: null,
+    },
   },
   { timestamps: true }
 );
 
-export default mongoose.model("User", userSchema);
+// Hash password sebelum disimpan
+UserSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
+
+// Method cek password
+UserSchema.methods.matchPassword = async function (inputPassword) {
+  return await bcrypt.compare(inputPassword, this.password);
+};
+
+const User = mongoose.model("User", UserSchema);
+export default User;
