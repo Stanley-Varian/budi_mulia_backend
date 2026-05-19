@@ -8,6 +8,8 @@ import {
   getPengumumanDetail,
   getEkskul,
   getProfil,
+  joinKelas,
+  getKelasSiswa,
 } from "../controllers/siswa.controller.js";
 
 const router = express.Router();
@@ -25,17 +27,21 @@ router.get("/profil", getProfil);
 // GET /api/siswa/jadwal?tahunAjaran=2024/2025
 router.get("/jadwal", getJadwal);
 
+// ── Kelas ───────────────────────────────────────────────────────────────────
+// POST /api/siswa/kelas/join   → join kelas dengan kode dari guru
+// GET  /api/siswa/kelas        → daftar kelas yang sudah diikuti
+router.post("/kelas/join", joinKelas);
+router.get("/kelas", getKelasSiswa);
+
 // ── Materi ──────────────────────────────────────────────────────────────────
 // GET /api/siswa/materi              → daftar mapel (grid card dashboard)
 // GET /api/siswa/materi/:mapel       → daftar materi per mapel
-// GET /api/siswa/materi/:mapel?pertemuan=1  → filter by pertemuan
 router.get("/materi", getMapelList);
 router.get("/materi/:mapel", getMateriByMapel);
 
 // ── Pengumuman ───────────────────────────────────────────────────────────────
-// GET /api/siswa/pengumuman          → list pengumuman
-// GET /api/siswa/pengumuman?page=1&limit=20
-// GET /api/siswa/pengumuman/:id      → detail pengumuman
+// GET /api/siswa/pengumuman
+// GET /api/siswa/pengumuman/:id
 router.get("/pengumuman", getPengumuman);
 router.get("/pengumuman/:id", getPengumumanDetail);
 
