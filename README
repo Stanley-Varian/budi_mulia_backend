@@ -1,0 +1,163 @@
+# 🏫 Backend API – SMA Budi Mulia
+
+Backend Express.js + MongoDB untuk sistem manajemen jadwal & materi SMA Budi Mulia.
+
+---
+
+## 🚀 Cara Menjalankan
+
+### 1. Install dependencies
+```bash
+npm install
+```
+
+### 2. Buat file `.env`
+Copy dari `.env.example` lalu isi dengan nilai asli:
+```bash
+cp .env.example .env
+```
+
+### 3. Jalankan server
+```bash
+npm run dev      # development (pakai nodemon)
+npm start        # production
+```
+
+Server berjalan di: `http://localhost:5000`
+
+---
+
+## 📤 Cara Push ke GitHub
+
+```bash
+# 1. Masuk ke folder project
+cd budi_mulia_backend-main
+
+# 2. Init git (kalau belum pernah)
+git init
+
+# 3. Tambahkan semua file (node_modules & .env sudah di .gitignore)
+git add .
+
+# 4. Commit
+git commit -m "feat: implementasi API admin (CRUD user, jadwal, pengumuman)"
+
+# 5. Hubungkan ke repo GitHub (ganti URL dengan repo kalian)
+git remote add origin https://github.com/username/nama-repo.git
+
+# 6. Push
+git push -u origin main
+```
+
+> ⚠️ File `.env` **tidak** akan ter-push karena sudah ada di `.gitignore`
+
+---
+
+## 📋 Daftar API Endpoint
+
+### 🔐 Auth
+| Method | Endpoint | Deskripsi |
+|--------|----------|-----------|
+| POST | `/api/auth/login` | Login user |
+
+**Body login:**
+```json
+{
+  "username": "admin",
+  "password": "password123"
+}
+```
+
+---
+
+### 👥 Admin – User Management
+> Semua endpoint butuh header: `Authorization: Bearer <token>`
+
+| Method | Endpoint | Deskripsi |
+|--------|----------|-----------|
+| GET | `/api/admin/users` | List semua user (siswa & guru) |
+| GET | `/api/admin/users/:id` | Detail 1 user |
+| POST | `/api/admin/users` | Buat user baru |
+| PUT | `/api/admin/users/:id` | Update user |
+| DELETE | `/api/admin/users/:id` | Hapus user |
+
+**Query params GET /users:**
+- `role=siswa` atau `role=guru`
+- `search=nama` — cari by nama/username
+- `page=1&limit=20` — pagination
+
+**Body POST/PUT user:**
+```json
+{
+  "nama": "Budi Santoso",
+  "username": "budi.santoso",
+  "password": "password123",
+  "role": "siswa",
+  "nisn": "1234567890",
+  "kelas": "10 B"
+}
+```
+Untuk guru:
+```json
+{
+  "nama": "Pak Ahmad",
+  "username": "pak.ahmad",
+  "password": "password123",
+  "role": "guru",
+  "nip": "198501012010011001",
+  "mapel": "Matematika"
+}
+```
+
+---
+
+### 📅 Admin – Jadwal
+| Method | Endpoint | Deskripsi |
+|--------|----------|-----------|
+| GET | `/api/admin/jadwal` | List jadwal |
+| POST | `/api/admin/jadwal/save` | Simpan/timpa jadwal |
+
+**Body POST jadwal/save:**
+```json
+{
+  "kelas": "10 B",
+  "tahunAjaran": "2024/2025",
+  "durasi": 45,
+  "jadwal": {
+    "Senin": {
+      "1": { "mapel": "Matematika", "guru": "Pak Ahmad" },
+      "2": { "mapel": "Fisika", "guru": "Bu Sari" }
+    },
+    "Selasa": {}
+  }
+}
+```
+
+---
+
+### 📢 Admin – Pengumuman
+| Method | Endpoint | Deskripsi |
+|--------|----------|-----------|
+| GET | `/api/admin/pengumuman` | List pengumuman |
+| POST | `/api/admin/pengumuman` | Buat pengumuman |
+| PUT | `/api/admin/pengumuman/:id` | Edit pengumuman |
+| DELETE | `/api/admin/pengumuman/:id` | Hapus pengumuman |
+
+**Body POST/PUT pengumuman:**
+```json
+{
+  "judul": "Libur Hari Raya",
+  "isi": "Sekolah libur tanggal 10-15 April 2025.",
+  "tag": "Libur",
+  "target": "semua",
+  "penting": true
+}
+```
+`target`: `"semua"` / `"siswa"` / `"guru"`
+
+---
+
+### 📊 Admin – Stats
+| Method | Endpoint | Deskripsi |
+|--------|----------|-----------|
+| GET | `/api/admin/stats` | Jumlah siswa, guru, pengumuman, jadwal |
