@@ -1,61 +1,44 @@
 import express from "express";
 import { protect, authorizeRoles } from "../middleware/auth.middleware.js";
+import {
+  getStats,
+  getUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  deleteUser,
+  saveJadwal,
+  getJadwal,
+  getPengumuman,
+  createPengumuman,
+  updatePengumuman,
+  deletePengumuman,
+} from "../controllers/admin.controller.js";
 
 const router = express.Router();
 
+// Semua route admin wajib login & role admin
 router.use(protect);
 router.use(authorizeRoles("admin"));
 
-// ── Stub endpoints — akan diimplementasi orang 4 ────────────────────────────
+// ── Stats ────────────────────────────────────────────
+router.get("/stats", getStats);
 
-// GET /api/admin/stats
-router.get("/stats", (req, res) => {
-  res.json({ success: true, message: "TODO: implementasi orang 4" });
-});
+// ── User CRUD ────────────────────────────────────────
+router.get("/users",        getUsers);
+router.get("/users/:id",    getUserById);
+router.post("/users",       createUser);
+router.put("/users/:id",    updateUser);
+router.delete("/users/:id", deleteUser);
 
-// GET /api/admin/users
-router.get("/users", (req, res) => {
-  res.json({ success: true, message: "TODO: implementasi orang 4" });
-});
+// ── Jadwal ───────────────────────────────────────────
+router.get("/jadwal",       getJadwal);
+router.post("/jadwal/save", saveJadwal);
 
-// POST /api/admin/users
-router.post("/users", (req, res) => {
-  res.json({ success: true, message: "TODO: implementasi orang 4" });
-});
-
-// PUT /api/admin/users/:id
-router.put("/users/:id", (req, res) => {
-  res.json({ success: true, message: "TODO: implementasi orang 4" });
-});
-
-// DELETE /api/admin/users/:id
-router.delete("/users/:id", (req, res) => {
-  res.json({ success: true, message: "TODO: implementasi orang 4" });
-});
-
-// POST /api/admin/jadwal/save
-router.post("/jadwal/save", (req, res) => {
-  res.json({ success: true, message: "TODO: implementasi orang 4" });
-});
-
-// GET /api/admin/pengumuman
-router.get("/pengumuman", (req, res) => {
-  res.json({ success: true, message: "TODO: implementasi orang 4" });
-});
-
-// POST /api/admin/pengumuman
-router.post("/pengumuman", (req, res) => {
-  res.json({ success: true, message: "TODO: implementasi orang 4" });
-});
-
-// PUT /api/admin/pengumuman/:id
-router.put("/pengumuman/:id", (req, res) => {
-  res.json({ success: true, message: "TODO: implementasi orang 4" });
-});
-
-// DELETE /api/admin/pengumuman/:id
-router.delete("/pengumuman/:id", (req, res) => {
-  res.json({ success: true, message: "TODO: implementasi orang 4" });
-});
+// ── Pengumuman ───────────────────────────────────────
+router.get("/pengumuman",        getPengumuman);
+router.post("/pengumuman",       createPengumuman);
+router.put("/pengumuman/:id",    updatePengumuman);
+router.delete("/pengumuman/:id", deletePengumuman);
 
 export default router;
