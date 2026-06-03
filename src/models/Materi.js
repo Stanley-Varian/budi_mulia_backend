@@ -37,6 +37,11 @@ const MateriSchema = new mongoose.Schema(
       type: String, // misal "10 B"
       required: true,
     },
+    kelasId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Kelas",
+      required: true,
+    },
     guru: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -49,7 +54,8 @@ const MateriSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-// Index supaya query by mapel + kelas cepat
+// Index supaya query by kelasId cepat
+MateriSchema.index({ kelasId: 1 });
 MateriSchema.index({ mapel: 1, kelas: 1 });
 
 const Materi = mongoose.model("Materi", MateriSchema);
