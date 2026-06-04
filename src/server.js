@@ -13,7 +13,14 @@ connectDB();
 
 const app = express();
 
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(cors({
+  origin: [
+    "http://localhost:3000",
+    "https://budi-mulia-rho.vercel.app",
+    /https:\/\/.*\.vercel\.app$/  // allow semua *.vercel.app
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 // ── Routes ──
