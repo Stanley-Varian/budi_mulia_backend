@@ -166,9 +166,10 @@ router.post("/materi", upload.single("file"), async (req, res) => {
     const { judul, deskripsi, kelasId, tipe, url, pertemuan, mapel, kelas: kelasNama } = req.body;
 
     // ✅ FIX: validasi benar, tidak return variabel yang belum ada
-    if (!judul || !kelasId) {
-      return res.status(400).json({ success: false, message: "judul dan kelasId wajib diisi." });
-    }
+   // Di route POST /api/guru/materi
+if (req.file) {
+  fileUrl = `${process.env.BASE_URL || "http://localhost:5000"}/uploads/${req.file.filename}`;
+}
 
     // cek kelas milik guru
     const kelas = await Kelas.findOne({ _id: kelasId, guru: req.user._id });
@@ -178,10 +179,15 @@ router.post("/materi", upload.single("file"), async (req, res) => {
 
     // ✅ FIX: tentukan url — dari file upload atau dari field url (untuk tipe link)
     let fileUrl = url || "";
-    if (req.file) {
-      fileUrl = `/uploads/${req.file.filename}`;
-    }
+  // SEBELUM
+if (req.file) {
+  materi.url = `/uploads/${req.file.filename}`;
+}
 
+// SESUDAH
+if (req.file) {
+  materi.url = `${process.env.BASE_URL || "http://localhost:5000"}/uploads/${req.file.filename}`;
+}
     // ✅ FIX: isi semua field required di schema
     const materiBaru = await Materi.create({
       judul,
