@@ -165,30 +165,20 @@ router.post("/materi", upload.single("file"), async (req, res) => {
   try {
     const { judul, deskripsi, kelasId, tipe, url, pertemuan, mapel, kelas: kelasNama } = req.body;
 
-    // ✅ FIX: validasi benar, tidak return variabel yang belum ada
-   // Di route POST /api/guru/materi
-if (req.file) {
-  fileUrl = `${process.env.BASE_URL || "http://localhost:5000"}/uploads/${req.file.filename}`;
-}
+    if (!judul || !kelasId) {
+      return res.status(400).json({ success: false, message: "judul dan kelasId wajib diisi." });
+    }
 
-    // cek kelas milik guru
     const kelas = await Kelas.findOne({ _id: kelasId, guru: req.user._id });
     if (!kelas) {
       return res.status(404).json({ success: false, message: "Kelas tidak ditemukan" });
     }
 
-    // ✅ FIX: tentukan url — dari file upload atau dari field url (untuk tipe link)
     let fileUrl = url || "";
-  // SEBELUM
-if (req.file) {
-  materi.url = `/uploads/${req.file.filename}`;
-}
+    if (req.file) {
+      fileUrl = `${process.env.BASE_URL || "http://localhost:5000"}/uploads/${req.file.filename}`;
+    }
 
-// SESUDAH
-if (req.file) {
-  materi.url = `${process.env.BASE_URL || "http://localhost:5000"}/uploads/${req.file.filename}`;
-}
-    // ✅ FIX: isi semua field required di schema
     const materiBaru = await Materi.create({
       judul,
       deskripsi: deskripsi || "",
@@ -196,9 +186,9 @@ if (req.file) {
       url: fileUrl,
       pertemuan: Number(pertemuan) || 1,
       mapel: mapel || kelas.mapel,
-      kelas: kelasNama || kelas.nama,   // String nama kelas, misal "10 A"
-      kelasId,                           // ObjectId ref ke Kelas
-      guru: req.user._id,                // ✅ dari token, bukan dari frontend
+      kelas: kelasNama || kelas.nama,
+      kelasId,
+      guru: req.user._id,
       namaGuru: req.user.nama || "",
     });
 
@@ -227,9 +217,8 @@ router.put("/materi/:id", upload.single("file"), async (req, res) => {
     if (deskripsi !== undefined) materi.deskripsi = deskripsi;
     if (tipe !== undefined) materi.tipe = tipe;
     if (pertemuan !== undefined) materi.pertemuan = Number(pertemuan);
-    // ✅ FIX: update url — dari file baru atau dari field url
     if (req.file) {
-      materi.url = `/uploads/${req.file.filename}`;
+      materi.url = `${process.env.BASE_URL || "http://localhost:5000"}/uploads/${req.file.filename}`;
     } else if (url !== undefined) {
       materi.url = url;
     }
