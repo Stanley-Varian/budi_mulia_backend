@@ -27,22 +27,28 @@ const UserSchema = new mongoose.Schema(
     },
 
     // ── Data Siswa ──
-    nisn: {
-      type: String,
-      default: null,
-    },
-    kelas: {
-      type: String, // misal "10 B"
-      default: null,
-    },
+    nisn: { type: String, default: null },
+    kelas: { type: String, default: null },
 
     // ── Data Guru ──
-    nip: {
+    nip: { type: String, default: null },
+    mapel: { type: String, default: null },
+
+    // ── Email (wajib untuk reset password) ──
+    email: {
+      type: String,
+      default: null,
+      lowercase: true,
+      trim: true,
+    },
+
+    // ── OTP Reset Password ──
+    resetOtp: {
       type: String,
       default: null,
     },
-    mapel: {
-      type: String, // misal "Matematika"
+    resetOtpExpiry: {
+      type: Date,
       default: null,
     },
   },
