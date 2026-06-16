@@ -3,6 +3,7 @@ import Materi from "../models/Materi.js";
 import Pengumuman from "../models/Pengumuman.js";
 import Ekskul from "../models/Ekskul.js";
 import Kelas from "../models/Kelas.js";
+import Kelas from "../models/kelas.model.js";
 
 // ── GET /api/siswa/jadwal ────────────────────────────────────────────────────
 export const getJadwal = async (req, res) => {
@@ -178,5 +179,37 @@ export const getProfil = async (req, res) => {
     res.json({ success: true, data: { nama: req.user.nama, username: req.user.username, nisn: req.user.nisn, kelas: req.user.kelas, role: req.user.role } });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const leaveKelas = async (req, res) => {
+  try {
+    const siswaId = req.user._id;
+    const kelasId = req.params.id;
+
+    const kelas = await Kelas.findById(kelasId);
+
+    if (!kelas) {
+      return res.status(404).json({
+        success: false,
+        message: "Kelas tidak ditemukan.",
+      });
+    }
+
+    kelas.anggota = kelas.anggota.filter(
+      (id) => id.toString() !== siswaId.toString()
+    );
+
+    await kelas.save();
+
+    res.json({
+      success: true,
+      message: "Berhasil keluar kelas.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };

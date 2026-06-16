@@ -10,43 +10,34 @@ import {
   getProfil,
   joinKelas,
   getKelasSiswa,
+  leaveKelas,
 } from "../controllers/siswa.controller.js";
 
 const router = express.Router();
 
-// Semua route siswa wajib login dan hanya bisa diakses role siswa
 router.use(protect);
 router.use(authorizeRoles("siswa"));
 
-// ── Profil ──────────────────────────────────────────────────────────────────
-// GET /api/siswa/profil
+//Profil 
 router.get("/profil", getProfil);
 
-// ── Jadwal ──────────────────────────────────────────────────────────────────
-// GET /api/siswa/jadwal
-// GET /api/siswa/jadwal?tahunAjaran=2024/2025
+//Jadwal
 router.get("/jadwal", getJadwal);
 
-// ── Kelas ───────────────────────────────────────────────────────────────────
-// POST /api/siswa/kelas/join   → join kelas dengan kode dari guru
-// GET  /api/siswa/kelas        → daftar kelas yang sudah diikuti
+//Kelas 
 router.post("/kelas/join", joinKelas);
 router.get("/kelas", getKelasSiswa);
+router.delete("/kelas/:id/leave", leaveKelas);
 
 // ── Materi ──────────────────────────────────────────────────────────────────
-// GET /api/siswa/materi              → daftar mapel (grid card dashboard)
-// GET /api/siswa/materi/:mapel       → daftar materi per mapel
 router.get("/materi", getMapelList);
 router.get("/materi/:mapel", getMateriByMapel);
 
 // ── Pengumuman ───────────────────────────────────────────────────────────────
-// GET /api/siswa/pengumuman
-// GET /api/siswa/pengumuman/:id
 router.get("/pengumuman", getPengumuman);
 router.get("/pengumuman/:id", getPengumumanDetail);
 
 // ── Ekskul ───────────────────────────────────────────────────────────────────
-// GET /api/siswa/ekskul
 router.get("/ekskul", getEkskul);
 
 export default router;
