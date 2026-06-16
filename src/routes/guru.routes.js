@@ -146,13 +146,9 @@ router.get("/kelas/:id/siswa", async (req, res) => {
 router.get("/materi/:kelasId", async (req, res) => {
   try {
     const { kelasId } = req.params;
-
     const kelas = await Kelas.findOne({ _id: kelasId, guru: req.user._id });
-    if (!kelas) {
-      return res.status(404).json({ success: false, message: "Kelas tidak ditemukan" });
-    }
+    if (!kelas) return res.status(404).json({ success: false, message: "Kelas tidak ditemukan" });
 
-    // ✅ FIX: query pakai kelasId (ObjectId ref), bukan kelas (string nama)
     const materi = await Materi.find({ kelasId }).sort({ createdAt: -1 });
     res.json({ success: true, data: materi });
   } catch (err) {
@@ -170,13 +166,20 @@ router.post("/materi", upload.single("file"), async (req, res) => {
     }
 
     const kelas = await Kelas.findOne({ _id: kelasId, guru: req.user._id });
-    if (!kelas) {
-      return res.status(404).json({ success: false, message: "Kelas tidak ditemukan" });
-    }
+    if (!kelas) return res.status(404).json({ success: false, message: "Kelas tidak ditemukan" });
 
+    // ✅ Cloudinary: req.file.path adalah URL langsung dari Cloudinary
     let fileUrl = url || "";
+    let fileSize = null;
+
     if (req.file) {
-      fileUrl = `${process.env.BASE_URL || "http://localhost:5000"}/uploads/${req.file.filename}`;
+      fileUrl = req.file.path; // URL Cloudinary, contoh: https://res.cloudinary.com/...
+      const bytes = req.file.size;
+      if (bytes) {
+        fileSize = bytes > 1024 * 1024
+          ? `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+          : `${Math.round(bytes / 1024)} KB`;
+      }
     }
 
     const materiBaru = await Materi.create({
@@ -184,6 +187,7 @@ router.post("/materi", upload.single("file"), async (req, res) => {
       deskripsi: deskripsi || "",
       tipe: tipe || "doc",
       url: fileUrl,
+      ukuran: fileSize,
       pertemuan: Number(pertemuan) || 1,
       mapel: mapel || kelas.mapel,
       kelas: kelasNama || kelas.nama,
@@ -192,11 +196,7 @@ router.post("/materi", upload.single("file"), async (req, res) => {
       namaGuru: req.user.nama || "",
     });
 
-    res.status(201).json({
-      success: true,
-      message: "Materi berhasil disimpan",
-      data: materiBaru,
-    });
+    res.status(201).json({ success: true, message: "Materi berhasil disimpan", data: materiBaru });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: err.message });
@@ -207,9 +207,7 @@ router.post("/materi", upload.single("file"), async (req, res) => {
 router.put("/materi/:id", upload.single("file"), async (req, res) => {
   try {
     const materi = await Materi.findOne({ _id: req.params.id, guru: req.user._id });
-    if (!materi) {
-      return res.status(404).json({ success: false, message: "Materi tidak ditemukan" });
-    }
+    if (!materi) return res.status(404).json({ success: false, message: "Materi tidak ditemukan" });
 
     const { judul, deskripsi, tipe, url, pertemuan } = req.body;
 
@@ -217,8 +215,16 @@ router.put("/materi/:id", upload.single("file"), async (req, res) => {
     if (deskripsi !== undefined) materi.deskripsi = deskripsi;
     if (tipe !== undefined) materi.tipe = tipe;
     if (pertemuan !== undefined) materi.pertemuan = Number(pertemuan);
+
     if (req.file) {
-      materi.url = `${process.env.BASE_URL || "http://localhost:5000"}/uploads/${req.file.filename}`;
+      // ✅ File baru → pakai URL Cloudinary
+      materi.url = req.file.path;
+      const bytes = req.file.size;
+      if (bytes) {
+        materi.ukuran = bytes > 1024 * 1024
+          ? `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+          : `${Math.round(bytes / 1024)} KB`;
+      }
     } else if (url !== undefined) {
       materi.url = url;
     }
@@ -234,9 +240,7 @@ router.put("/materi/:id", upload.single("file"), async (req, res) => {
 router.delete("/materi/:id", async (req, res) => {
   try {
     const materi = await Materi.findOneAndDelete({ _id: req.params.id, guru: req.user._id });
-    if (!materi) {
-      return res.status(404).json({ success: false, message: "Materi tidak ditemukan" });
-    }
+    if (!materi) return res.status(404).json({ success: false, message: "Materi tidak ditemukan" });
     res.json({ success: true, message: "Materi berhasil dihapus" });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
