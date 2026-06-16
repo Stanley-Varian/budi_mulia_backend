@@ -3,7 +3,7 @@ import Materi from "../models/Materi.js";
 import Pengumuman from "../models/Pengumuman.js";
 import Ekskul from "../models/Ekskul.js";
 import Kelas from "../models/Kelas.js";
-import Kelas from "../models/kelas.model.js";
+import Kelas from "../models/Kelas.js";
 
 // ── GET /api/siswa/jadwal ────────────────────────────────────────────────────
 export const getJadwal = async (req, res) => {
